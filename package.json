@@ -1,0 +1,28 @@
+{
+  "name": "month-picker",
+  "version": "0.1.0",
+  "description": "A Web component for picking months by different intervals",
+  "main": "index.js",
+  "scripts": {
+    "start": "web-server -o",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TechQuery/month-picker.git"
+  },
+  "keywords": [
+    "date-picker",
+    "html-element",
+    "web-component"
+  ],
+  "author": "shiy2008@gmail.com",
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/TechQuery/month-picker/issues"
+  },
+  "homepage": "https://github.com/TechQuery/month-picker#readme",
+  "devDependencies": {
+    "koapache": "^0.2.1"
+  }
+}

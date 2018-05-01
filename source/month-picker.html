@@ -1,0 +1,61 @@
+<template>
+    <style>
+        .table-row {
+            display:    table;
+            margin:     0;
+            padding:    0;
+        }
+        .table-row > * {
+            display:           table-cell;
+            vertical-align:    top;
+        }
+
+        .table-row > ul {
+            list-style:    none;
+            padding:       0;
+        }
+        main {
+            width:    8rem;
+        }
+        main > span {
+            display:           inline-block;
+            vertical-align:    middle;
+            width:             1.5rem;
+        }
+
+        .table-row > ul > li,  main > span,  nav.table-row > *  {
+            padding:        0.5rem;
+            text-align:     center;
+            line-height:    1.5rem;
+            cursor:         pointer;
+            transition:     0.25s;
+        }
+        .table-row > ul > li.active,  main > span.active  {
+            background:    lightskyblue;
+            color:         white;
+        }
+    </style>
+
+    <div class="table-row">
+        <ul>
+            <li>Month</li>
+            <li>Season</li>
+            <li>½ year</li>
+        </ul>
+        <div>
+            <nav class="table-row">
+                <span>←</span>
+                <div>2018</div>
+                <span>→</span>
+            </nav>
+            <main>
+                <span>1</span><span>2</span><span>3</span>
+                <span>4</span><span>5</span><span>6</span>
+                <span>7</span><span>8</span><span>9</span>
+                <span>10</span><span>11</span><span>12</span>
+            </main>
+        </div>
+    </div>
+</template>
+
+<script src="index.js"></script>
