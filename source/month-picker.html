@@ -9,6 +9,13 @@
             display:           table-cell;
             vertical-align:    top;
         }
+        .no-select {
+    -webkit-user-select:    none;
+       -moz-user-select:    none;
+        -ms-user-select:    none;
+            user-select:    none;
+            cursor:         pointer;
+        }
 
         .table-row > ul {
             list-style:    none;
@@ -27,7 +34,6 @@
             padding:        0.5rem;
             text-align:     center;
             line-height:    1.5rem;
-            cursor:         pointer;
             transition:     0.25s;
         }
         .table-row > ul > li.active,  main > span.active  {
@@ -36,11 +42,11 @@
         }
     </style>
 
-    <div class="table-row">
+    <div class="table-row no-select">
         <ul>
-            <li>Month</li>
-            <li>Season</li>
-            <li>½ year</li>
+            <li data-range="1">Month</li>
+            <li data-range="3">Season</li>
+            <li data-range="6">½ year</li>
         </ul>
         <div>
             <nav class="table-row">
