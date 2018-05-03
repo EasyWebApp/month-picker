@@ -14,34 +14,36 @@
         }
         .no-select {
     -webkit-user-select:    none;
-       -moz-user-select:    none;
+        -moz-user-select:    none;
         -ms-user-select:    none;
             user-select:    none;
             cursor:         pointer;
         }
 
         :host {
-            outline:     none;
-            position:    relative;
+            outline:    none;
         }
         input[name] {
             display:    block;
             width:      12.7rem;
+            margin:     0.25rem;
+            padding:    0.5rem;
         }
         input[name] + .table-row {
-            position:    absolute;
-            left:        0;
-            top:         0.5rem;
+            position:      absolute;
+            z-index:       1;
+            background:    white;
+            box-shadow:    1px 2px 3px gray;
         }
         .table-row > ul {
             list-style:    none;
             padding:       0 0.5rem 0 0;
         }
-        nav {
+        nav.table-row {
             margin:    auto;
         }
         main {
-            width:    8rem;
+            width:    7.5rem;
         }
         main > span {
             display:           inline-block;
@@ -55,7 +57,9 @@
             line-height:    1.5rem;
             transition:     0.25s;
         }
-        .table-row > ul > li.active,  main > span.active  {
+        .table-row > ul > li.active,
+        nav.table-row > span:active,
+        main > span.active  {
             background:    lightskyblue;
             color:         white;
         }
@@ -74,7 +78,7 @@
         <div>
             <nav class="table-row">
                 <span>←</span>
-                <div>2018</div>
+                <div></div>
                 <span>→</span>
             </nav>
             <main>
