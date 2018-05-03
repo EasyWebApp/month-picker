@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "web-server -o",
+    "lint": "eslint ./source/ ./test/",
+    "precommit": "npm run lint",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,6 +25,8 @@
   },
   "homepage": "https://github.com/TechQuery/month-picker#readme",
   "devDependencies": {
+    "eslint": "^4.19.1",
+    "husky": "^0.14.3",
     "koapache": "^0.2.1"
   }
 }

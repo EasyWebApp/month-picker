@@ -5,6 +5,9 @@
             margin:     0;
             padding:    0;
         }
+        .table-row[hidden] {
+            display:    none;
+        }
         .table-row > * {
             display:           table-cell;
             vertical-align:    top;
@@ -17,9 +20,25 @@
             cursor:         pointer;
         }
 
+        :host {
+            outline:     none;
+            position:    relative;
+        }
+        input[name] {
+            display:    block;
+            width:      12.7rem;
+        }
+        input[name] + .table-row {
+            position:    absolute;
+            left:        0;
+            top:         0.5rem;
+        }
         .table-row > ul {
             list-style:    none;
-            padding:       0;
+            padding:       0 0.5rem 0 0;
+        }
+        nav {
+            margin:    auto;
         }
         main {
             width:    8rem;
@@ -42,7 +61,11 @@
         }
     </style>
 
-    <div class="table-row no-select">
+    <input type="text" name="startTime" />
+
+    <input type="text" name="endTime" />
+
+    <div class="table-row no-select" hidden>
         <ul>
             <li data-range="1">Month</li>
             <li data-range="3">Season</li>
