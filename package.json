@@ -1,7 +1,7 @@
 {
   "name": "month-picker",
-  "version": "0.5.0",
-  "description": "A Web component for picking months by different ranges",
+  "version": "0.6.0",
+  "description": "A Web component for picking months by different steps",
   "main": "index.js",
   "scripts": {
     "start": "web-server -o",

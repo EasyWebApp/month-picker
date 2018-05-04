@@ -1,6 +1,6 @@
 # Month picker
 
-A [Web component](https://www.webcomponents.org/) for picking months by different ranges
+A [Web component](https://www.webcomponents.org/) for picking months by different steps
 
 
 

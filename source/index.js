@@ -1,19 +1,28 @@
 (() => {  'use strict';
 
     const _private_ = new WeakMap(),
-        selector_map = {
-            Range:    '.table-row > ul > li',
+        $ = document.querySelectorAll.bind( document.currentScript.ownerDocument );
+
+    const selector_map = {
+            Step:    '.table-row > ul > li',
             Month:    'main > span',
             Year:     'nav > span'
         },
-        template = document.currentScript.previousElementSibling.content;
+        template = $('template')[0].content,
+        style = $('link[rel="stylesheet"]')[0];
+
+    style.remove();
+
+    style.setAttribute('href', style.href);
+
+    template.insertBefore(style, template.children[0]);
 
 
     class MonthPicker extends HTMLElement {
 
         constructor() {
 
-            _private_.set(super(),  {range: 1});
+            _private_.set(super(),  { });
 
             this.attachShadow({
                 mode:              'open',
@@ -25,9 +34,39 @@
             this.listen();
         }
 
+        $(selector) {
+
+            return  [... this.shadowRoot.querySelectorAll( selector )];
+        }
+
         static get observedAttributes() {
 
-            return  ['value', 'convention'];
+            const map = {
+                value:         1,
+                step:          1,
+                convention:    3
+            };
+
+            for (let key in map) {
+
+                let config = {enumerable: true};
+
+                if (map[ key ]  &  1)
+                    config.get = function () {
+
+                        return  _private_.get( this )[ key ];
+                    };
+
+                if (map[ key ]  &  2)
+                    config.set = function (value) {
+
+                        _private_.get( this )[ key ] = value;
+                    };
+
+                Object.defineProperty(this.prototype, key, config);
+            }
+
+            return  Object.keys( map );
         }
 
         attributeChangedCallback(name, oldValue, newValue) {
@@ -35,13 +74,14 @@
             switch ( newValue ) {
                 case '':      this[ name ] = true;      break;
                 case null:    this[ name ] = false;     break;
-                default:      this[ name ] = newValue;
+                default:      try {
+                    this[ name ] = JSON.parse( newValue );
+
+                } catch (error) {
+
+                    this[ name ] = newValue;
+                }
             }
-        }
-
-        get range() {
-
-            return  _private_.get( this ).range;
         }
 
         get defaultValue() {
@@ -49,14 +89,11 @@
             return this.getAttribute('value');
         }
 
-        get value() {
-
-            return  _private_.get( this ).value;
-        }
-
         set value(value) {
 
-            this.shadowRoot.querySelector('div[contenteditable]').textContent =
+            if ((value instanceof Array)  &&  (! value[1]))  value.pop();
+
+            this.$('div[contenteditable]')[0].textContent =
                 _private_.get( this ).value = value + '';
 
             const event = document.createEvent('Event');
@@ -64,16 +101,6 @@
             event.initEvent('change', true, false);
 
             this.shadowRoot.host.dispatchEvent( event );
-        }
-
-        set convention(value) {
-
-            _private_.get( this ).convention = value;
-        }
-
-        get convention() {
-
-            return  _private_.get( this ).convention;
         }
 
         static targetOf(event) {
@@ -85,9 +112,7 @@
 
         show(visible, event) {
 
-            const layer = this.shadowRoot.querySelector(
-                'div[contenteditable] + .table-row'
-            );
+            const layer = this.$('div[contenteditable] + .table-row')[0];
 
             if (! visible)  return  (! layer.hidden) && (layer.hidden = true);
 
@@ -102,8 +127,8 @@
 
         listen() {
 
-            const year = this.shadowRoot.querySelector('nav > div'),
-                month = this.shadowRoot.querySelectorAll( selector_map.Month );
+            const year = this.$('nav > div')[0],
+                month = this.$( selector_map.Month );
 
             this.shadowRoot.host.addEventListener(
                 'focus',  this.show.bind(this, true)
@@ -122,7 +147,7 @@
                         this['switch' + key]( target );
             });
 
-            this.shadowRoot.querySelector('div[contenteditable]').addEventListener(
+            this.$('div[contenteditable]')[0].addEventListener(
                 'blur',  event => {
 
                     const date = new Date( event.target.textContent.split(',')[0] );
@@ -138,11 +163,24 @@
 
         makeDate(month) {
 
-            const year = this.shadowRoot.querySelector('nav > div').textContent;
+            const year = this.$('nav > div')[0].textContent;
 
             month = month  ?  `${year}-${month.padStart(2, 0)}`  :  Date.now();
 
             return  (new Date( month )).toISOString().slice(0, 7);
+        }
+
+        set step(value) {
+
+            _private_.get( this ).step = value;
+
+            this.switchStep(
+                this.$(`${
+                    selector_map.Step
+                }[data-step="${
+                    this.convention ? 1 : value
+                }"]`)[0]
+            );
         }
 
         connectedCallback() {
@@ -151,16 +189,12 @@
 
             const value = this.value.split('-');
 
-            this.shadowRoot.querySelector('nav > div').textContent = value[0];
+            this.$('nav > div')[0].textContent = value[0];
 
-            this.switchRange(
-                this.shadowRoot.querySelector( selector_map.Range )
-            );
+            if (! this.step)  this.step = 1;
 
             this.switchMonth(
-                this.shadowRoot.querySelector(
-                    `${selector_map.Month}:nth-child(${+value[1]})`
-                )
+                this.$(`${ selector_map.Month }:nth-child(${ +value[1] })`)[0]
             );
         }
 
@@ -173,14 +207,14 @@
             return index;
         }
 
-        toggleActive(target,  range = 1) {
+        toggleActive(target,  step = 1) {
 
             const active = MonthPicker.indexOf( target ), list = [ ];
 
             Array.from(target.parentNode.children,  (child, index) => {
 
                 if ((child === target)  ||  (
-                    (index > active)  &&  (index < active + range)
+                    (index > active)  &&  (index < active + step)
                 )) {
                     child.classList.add('active');
 
@@ -194,18 +228,18 @@
 
         switchMonth(first) {
 
-            first = first || this.shadowRoot.querySelector('main > .active');
+            first = first || this.$('main > .active')[0];
 
             if (! first)  return;
 
             if ( this.convention )
-                first = this.shadowRoot.querySelectorAll( selector_map.Month )[
-                    this.range * Math.floor(
-                        MonthPicker.indexOf( first ) / this.range
+                first = this.$( selector_map.Month )[
+                    this.step * Math.floor(
+                        MonthPicker.indexOf( first ) / this.step
                     )
                 ];
 
-            const active = this.toggleActive(first, this.range);
+            const active = this.toggleActive(first, this.step);
 
             const last = active[1] && active.pop();
 
@@ -214,13 +248,15 @@
             ];
         }
 
-        switchRange(target) {
+        switchStep(target) {
+
+            if (! target)  return;
 
             const _this_ = _private_.get( this );
 
             this.toggleActive(target);
 
-            _this_.range = +target.dataset.range;
+            _this_.step = +target.dataset.step;
 
             this.switchMonth();
         }
