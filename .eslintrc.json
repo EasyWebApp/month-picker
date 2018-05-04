@@ -19,5 +19,8 @@
         "no-console": ["error", {
             "allow": ["info", "warn", "error", "time", "timeEnd"]
         }]
+    },
+    "globals": {
+        "EWA": false
     }
 }

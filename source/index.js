@@ -1,87 +1,26 @@
 (() => {  'use strict';
 
-    const _private_ = new WeakMap(),
-        $ = document.querySelectorAll.bind( document.currentScript.ownerDocument );
-
     const selector_map = {
-            Step:    '.table-row > ul > li',
-            Month:    'main > span',
-            Year:     'nav > span'
-        },
-        template = $('template')[0].content,
-        style = $('link[rel="stylesheet"]')[0];
-
-    style.remove();
-
-    style.setAttribute('href', style.href);
-
-    template.insertBefore(style, template.children[0]);
+        Step:    '.table-row > ul > li',
+        Month:    'main > span',
+        Year:     'nav > span'
+    };
 
 
-    class MonthPicker extends HTMLElement {
+    customElements.define('month-picker',  class MonthPicker extends EWA.component() {
 
         constructor() {
 
-            _private_.set(super(),  { });
-
-            this.attachShadow({
-                mode:              'open',
-                delegatesFocus:    true
-            }).appendChild(
-                template.cloneNode( true )
-            );
-
-            this.listen();
-        }
-
-        $(selector) {
-
-            return  [... this.shadowRoot.querySelectorAll( selector )];
+            super().listen();
         }
 
         static get observedAttributes() {
 
-            const map = {
+            return this.defineAccessor({
                 value:         1,
                 step:          1,
                 convention:    3
-            };
-
-            for (let key in map) {
-
-                let config = {enumerable: true};
-
-                if (map[ key ]  &  1)
-                    config.get = function () {
-
-                        return  _private_.get( this )[ key ];
-                    };
-
-                if (map[ key ]  &  2)
-                    config.set = function (value) {
-
-                        _private_.get( this )[ key ] = value;
-                    };
-
-                Object.defineProperty(this.prototype, key, config);
-            }
-
-            return  Object.keys( map );
-        }
-
-        attributeChangedCallback(name, oldValue, newValue) {
-
-            switch ( newValue ) {
-                case '':      this[ name ] = true;      break;
-                case null:    this[ name ] = false;     break;
-                default:      try {
-                    this[ name ] = JSON.parse( newValue );
-
-                } catch (error) {
-
-                    this[ name ] = newValue;
-                }
-            }
+            });
         }
 
         get defaultValue() {
@@ -94,20 +33,13 @@
             if ((value instanceof Array)  &&  (! value[1]))  value.pop();
 
             this.$('div[contenteditable]')[0].textContent =
-                _private_.get( this ).value = value + '';
+                EWA.set(this,  'value',  value + '');
 
             const event = document.createEvent('Event');
 
             event.initEvent('change', true, false);
 
             this.shadowRoot.host.dispatchEvent( event );
-        }
-
-        static targetOf(event) {
-
-            const target = event.composedPath ? event.composedPath() : event.path;
-
-            return  (target || '')[0]  ||  event.target;
         }
 
         show(visible, event) {
@@ -172,7 +104,7 @@
 
         set step(value) {
 
-            _private_.get( this ).step = value;
+            EWA.set(this, 'step', value);
 
             this.switchStep(
                 this.$(`${
@@ -196,15 +128,6 @@
             this.switchMonth(
                 this.$(`${ selector_map.Month }:nth-child(${ +value[1] })`)[0]
             );
-        }
-
-        static indexOf(element) {
-
-            var index = 0;
-
-            while (element = element.previousElementSibling)  index++;
-
-            return index;
         }
 
         toggleActive(target,  step = 1) {
@@ -252,11 +175,9 @@
 
             if (! target)  return;
 
-            const _this_ = _private_.get( this );
-
             this.toggleActive(target);
 
-            _this_.step = +target.dataset.step;
+            EWA.set(this, 'step', +target.dataset.step);
 
             this.switchMonth();
         }
@@ -270,7 +191,5 @@
 
             this.switchMonth();
         }
-    }
-
-    self.customElements.define('month-picker', MonthPicker);
+    });
 })();
