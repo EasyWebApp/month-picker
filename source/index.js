@@ -2,9 +2,9 @@
 
     const _private_ = new WeakMap(),
         selector_map = {
-            '.table-row > ul > li':    'Range',
-            'main > span':             'Month',
-            'nav > span':              'Year'
+            Range:    '.table-row > ul > li',
+            Month:    'main > span',
+            Year:     'nav > span'
         },
         template = document.currentScript.previousElementSibling.content;
 
@@ -27,12 +27,16 @@
 
         static get observedAttributes() {
 
-            return ['value'];
+            return  ['value', 'convention'];
         }
 
         attributeChangedCallback(name, oldValue, newValue) {
 
-            this[ name ] = newValue;
+            switch ( newValue ) {
+                case '':      this[ name ] = true;      break;
+                case null:    this[ name ] = false;     break;
+                default:      this[ name ] = newValue;
+            }
         }
 
         get range() {
@@ -52,20 +56,24 @@
 
         set value(value) {
 
-            _private_.get( this ).value = value = value + '';
-
-            value = value.split(',');
-
-            Array.from(
-                this.shadowRoot.querySelectorAll('input'),
-                (input, index)  =>  input.value = value[ index ] || ''
-            );
+            this.shadowRoot.querySelector('div[contenteditable]').textContent =
+                _private_.get( this ).value = value + '';
 
             const event = document.createEvent('Event');
 
             event.initEvent('change', true, false);
 
             this.shadowRoot.host.dispatchEvent( event );
+        }
+
+        set convention(value) {
+
+            _private_.get( this ).convention = value;
+        }
+
+        get convention() {
+
+            return  _private_.get( this ).convention;
         }
 
         static targetOf(event) {
@@ -77,7 +85,9 @@
 
         show(visible, event) {
 
-            const layer = this.shadowRoot.querySelector('input[name] + .table-row');
+            const layer = this.shadowRoot.querySelector(
+                'div[contenteditable] + .table-row'
+            );
 
             if (! visible)  return  (! layer.hidden) && (layer.hidden = true);
 
@@ -93,7 +103,7 @@
         listen() {
 
             const year = this.shadowRoot.querySelector('nav > div'),
-                month = this.shadowRoot.querySelectorAll('main > span');
+                month = this.shadowRoot.querySelectorAll( selector_map.Month );
 
             this.shadowRoot.host.addEventListener(
                 'focus',  this.show.bind(this, true)
@@ -107,18 +117,17 @@
 
                 const target = event.target;
 
-                for (let selector  in  selector_map)
-                    if (target.matches( selector ))
-                        this['switch' + selector_map[selector]]( target );
+                for (let key  in  selector_map)
+                    if (target.matches( selector_map[key] ))
+                        this['switch' + key]( target );
             });
 
-            this.shadowRoot.querySelector('input[name]').addEventListener(
-                'change',  event => {
+            this.shadowRoot.querySelector('div[contenteditable]').addEventListener(
+                'blur',  event => {
 
-                    const date = new Date( event.target.value );
+                    const date = new Date( event.target.textContent.split(',')[0] );
 
-                    if (date == 'Invalid Date')
-                        return  event.target.select(), event.target.focus();
+                    if (date == 'Invalid Date')  return event.target.focus();
 
                     year.textContent = date.getFullYear();
 
@@ -138,14 +147,21 @@
 
         connectedCallback() {
 
-            this.shadowRoot.querySelector('nav > div').textContent =
-                (new Date()).getFullYear();
+            this.value = this.defaultValue || this.makeDate();
+
+            const value = this.value.split('-');
+
+            this.shadowRoot.querySelector('nav > div').textContent = value[0];
 
             this.switchRange(
-                this.shadowRoot.querySelector('.table-row > ul > li')
+                this.shadowRoot.querySelector( selector_map.Range )
             );
 
-            this.value = this.defaultValue || this.makeDate();
+            this.switchMonth(
+                this.shadowRoot.querySelector(
+                    `${selector_map.Month}:nth-child(${+value[1]})`
+                )
+            );
         }
 
         static indexOf(element) {
@@ -182,9 +198,14 @@
 
             if (! first)  return;
 
-            const _this_ = _private_.get( this );
+            if ( this.convention )
+                first = this.shadowRoot.querySelectorAll( selector_map.Month )[
+                    this.range * Math.floor(
+                        MonthPicker.indexOf( first ) / this.range
+                    )
+                ];
 
-            const active = this.toggleActive(first, _this_.range);
+            const active = this.toggleActive(first, this.range);
 
             const last = active[1] && active.pop();
 
@@ -200,9 +221,6 @@
             this.toggleActive(target);
 
             _this_.range = +target.dataset.range;
-
-            this.shadowRoot.querySelectorAll('input')[1].disabled =
-                (_this_.range === 1);
 
             this.switchMonth();
         }

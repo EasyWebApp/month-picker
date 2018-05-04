@@ -1,5 +1,12 @@
 <template>
     <style>
+        [contenteditable][rows="1"] {
+            padding:          0.5rem;
+            height:           1.4rem;
+            white-space:      nowrap;
+            text-overflow:    ellipsis;
+            overflow:         hidden;
+        }
         .table-row {
             display:    table;
             margin:     0;
@@ -23,15 +30,33 @@
         :host {
             outline:    none;
         }
-        input[name] {
-            display:    block;
-            width:      12.7rem;
-            margin:     0.25rem;
-            padding:    0.5rem;
+        div[contenteditable][rows="1"] {
+            border:           1px  solid;
+            padding-left:     2.5rem;
+            padding-right:    2.5rem;
+            width:            8.2rem;
+            margin:           0.25rem  0;
+            position:         relative;
         }
-        input[name] + .table-row {
+        div[contenteditable]::before, div[contenteditable]::after {
             position:      absolute;
+            top:           0.5rem;
             z-index:       1;
+            width:         1.5rem;
+            text-align:    center;
+        }
+        div[contenteditable]::before {
+            content:    "📅";
+            left:       0.5rem;
+        }
+        div[contenteditable]::after {
+            content:    "↓";
+            right:      0.5rem;
+        }
+
+        div[contenteditable] + .table-row {
+            position:      absolute;
+            z-index:       2;
             background:    white;
             box-shadow:    1px 2px 3px gray;
         }
@@ -65,9 +90,7 @@
         }
     </style>
 
-    <input type="text" name="startTime" />
-
-    <input type="text" name="endTime" />
+    <div contenteditable="true" rows="1"></div>
 
     <div class="table-row no-select" hidden>
         <ul>
