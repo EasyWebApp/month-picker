@@ -6,17 +6,13 @@
         Year:     'nav > span'
     };
 
+    WebCell.component(class MonthPicker extends HTMLElement {
 
-    customElements.define('month-picker',  class MonthPicker extends EWA.component() {
-
-        constructor() {
-
-            super().listen();
-        }
+        constructor() {  super();  }
 
         static get observedAttributes() {
 
-            return this.defineAccessor({
+            return this.setAccessor({
                 value:         1,
                 step:          1,
                 convention:    3
@@ -33,7 +29,7 @@
             if ((value instanceof Array)  &&  (! value[1]))  value.pop();
 
             this.$('div[contenteditable]')[0].textContent =
-                EWA.set(this,  'value',  value + '');
+                WebCell.set(this,  'value',  value + '');
 
             const event = document.createEvent('Event');
 
@@ -104,7 +100,7 @@
 
         set step(value) {
 
-            EWA.set(this, 'step', value);
+            WebCell.set(this, 'step', value);
 
             this.switchStep(
                 this.$(`${
@@ -116,6 +112,8 @@
         }
 
         connectedCallback() {
+
+            this.listen();
 
             this.value = this.defaultValue || this.makeDate();
 
@@ -177,7 +175,7 @@
 
             this.toggleActive(target);
 
-            EWA.set(this, 'step', +target.dataset.step);
+            WebCell.set(this, 'step', +target.dataset.step);
 
             this.switchMonth();
         }

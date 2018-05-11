@@ -16,7 +16,8 @@
   "keywords": [
     "date-picker",
     "html-element",
-    "web-component"
+    "web-component",
+    "web-cell"
   ],
   "author": "shiy2008@gmail.com",
   "license": "LGPL-3.0",
@@ -28,5 +29,8 @@
     "eslint": "^4.19.1",
     "husky": "^0.14.3",
     "koapache": "^0.2.1"
+  },
+  "dependencies": {
+    "web-cell": "^0.7.0"
   }
 }
