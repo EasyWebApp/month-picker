@@ -1,28 +1,50 @@
 <template>
-    <div contenteditable="true" rows="1"></div>
+    <div contenteditable="true" rows="1">${host.value}</div>
 
-    <div class="table-row no-select" hidden>
-        <ul>
-            <li data-step="1">Month</li>
-            <li data-step="3">Season</li>
-            <li data-step="6">½ year</li>
-        </ul>
+    <main class="table-row no-select">
+        <nav>
+            <input
+                type="radio"
+                name="step"
+                value="1"
+                id="M-1"
+                checked="${host.isChecked( this )}"
+            />
+            <label for="M-1">Month</label>
+
+            <input
+                type="radio"
+                name="step"
+                value="3"
+                id="M-3"
+                checked="${host.isChecked( this )}"
+            />
+            <label for="M-3">Season</label>
+
+            <input
+                type="radio"
+                name="step"
+                value="6"
+                id="M-6"
+                checked="${host.isChecked( this )}"
+            />
+            <label for="M-6">½ year</label>
+        </nav>
         <div>
             <nav class="table-row">
                 <span>←</span>
-                <div></div>
+                <div>${host.year}</div>
                 <span>→</span>
             </nav>
-            <main>
-                <span>1</span><span>2</span><span>3</span>
-                <span>4</span><span>5</span><span>6</span>
-                <span>7</span><span>8</span><span>9</span>
-                <span>10</span><span>11</span><span>12</span>
+            <main id="Month" data-array="months">
+                <template>
+                    <span
+                        class="${host.isSelected(view.index) ? 'active' : ''}"
+                    >
+                        ${view.index + 1}
+                    </span>
+                </template>
             </main>
         </div>
-    </div>
+    </main>
 </template>
-
-<link rel="stylesheet" href="index.css" />
-
-<script src="index.js"></script>

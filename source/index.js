@@ -1,193 +1,151 @@
-(() => {  'use strict';
+import { component, mapProperty, mapData, on, indexOf } from 'web-cell';
 
-    const selector_map = {
-        Step:    '.table-row > ul > li',
-        Month:    'main > span',
-        Year:     'nav > span'
-    };
+import template from './index.html';
 
-    WebCell.component(class MonthPicker extends HTMLElement {
+import style from './index.less';
 
-        constructor() {  super();  }
+@component({ template, style })
+export default class MonthPicker extends HTMLElement {
+    constructor() {
+        super().buildDOM();
+    }
 
-        static get observedAttributes() {
+    @mapProperty
+    static get observedAttributes() {
+        return ['value', 'step', 'convention'];
+    }
 
-            return this.setAccessor({
-                value:         1,
-                step:          1,
-                convention:    3
-            });
+    @mapData
+    attributeChangedCallback() {}
+
+    connectedCallback() {
+        var value = this.defaultValue;
+
+        if (!value) return;
+
+        value = value.split('-');
+
+        (this.year = value[0]), (this.month = value[1] - 1);
+    }
+
+    get defaultValue() {
+        return this.getAttribute('value');
+    }
+
+    static get data() {
+        const now = new Date();
+
+        return {
+            value: [now],
+            year: now.getFullYear(),
+            month: now.getMonth(),
+            months: Array(12)
+                .fill(0)
+                .map(() => ({})),
+            step: 1
+        };
+    }
+
+    /**
+     * @private
+     *
+     * @param {Date} date
+     *
+     * @return {String} `YYYY-MM`
+     */
+    static valueOf(date) {
+        return /^\d+-\d+/.exec(date.toJSON())[0];
+    }
+
+    set value(raw) {
+        const [start, end] = (raw + '').split(','),
+            value = [];
+
+        if (start) value.push(new Date(start));
+
+        if (end) value.push(new Date(end));
+
+        this.view.value = value;
+    }
+
+    get value() {
+        var [start, end] = this.view.value;
+
+        start = MonthPicker.valueOf(start);
+
+        return end ? [start, MonthPicker.valueOf(end)] : start;
+    }
+
+    get year() {
+        return this.view.year;
+    }
+
+    set year(year) {
+        const [start, end] = this.view.value;
+
+        start.setFullYear(year);
+
+        if (end) end.setFullYear(year);
+
+        this.view.render({ year, value: [start, end] });
+    }
+
+    static startOf(month, step) {
+        return month - ((month - 1) % step);
+    }
+
+    get month() {
+        return this.view.month;
+    }
+
+    set month(month) {
+        if (this.convention)
+            month = MonthPicker.startOf(month + 1, this.step) - 1;
+
+        var [start, end] = this.view.value,
+            { step } = this;
+
+        start.setMonth(month);
+
+        if (step > 1) {
+            end = end || new Date();
+
+            end.setFullYear(this.year);
+
+            end.setUTCMonth(month + step - 1);
+        } else {
+            end = '';
         }
 
-        get defaultValue() {
+        this.view.render({ month, value: [start, end] });
+    }
 
-            return this.getAttribute('value');
-        }
+    isChecked(input) {
+        return this.step == input.value;
+    }
 
-        set value(value) {
+    isSelected(index) {
+        const { month, step } = this;
 
-            if ((value instanceof Array)  &&  (! value[1]))  value.pop();
+        const distance = index - month;
 
-            this.$('div[contenteditable]')[0].textContent =
-                WebCell.set(this,  'value',  value + '');
+        return distance >= 0 && distance % step === distance;
+    }
 
-            const event = document.createEvent('Event');
+    @on('click', ':host nav > span')
+    changeYear(_, target) {
+        target.nextElementSibling ? this.year-- : this.year++;
+    }
 
-            event.initEvent('change', true, false);
+    @on('click', ':host #Month > *')
+    changeMonth(_, target) {
+        this.month = indexOf(target);
+    }
 
-            this.shadowRoot.host.dispatchEvent( event );
-        }
+    @on('click', ':host main > nav input')
+    changeStep(_, target) {
+        this.view.render({ step: +target.value });
 
-        show(visible, event) {
-
-            const layer = this.$('div[contenteditable] + .table-row')[0];
-
-            if (! visible)  return  (! layer.hidden) && (layer.hidden = true);
-
-            const coord = MonthPicker.targetOf( event ).getBoundingClientRect();
-
-            layer.style.left = coord.left;
-
-            layer.style.top = coord.bottom;
-
-            if ( layer.hidden )  layer.hidden = false;
-        }
-
-        listen() {
-
-            const year = this.$('nav > div')[0],
-                month = this.$( selector_map.Month );
-
-            this.shadowRoot.host.addEventListener(
-                'focus',  this.show.bind(this, true)
-            );
-
-            this.shadowRoot.host.addEventListener(
-                'blur',  this.show.bind(this, false)
-            );
-
-            this.shadowRoot.addEventListener('click',  event => {
-
-                const target = event.target;
-
-                for (let key  in  selector_map)
-                    if (target.matches( selector_map[key] ))
-                        this['switch' + key]( target );
-            });
-
-            this.$('div[contenteditable]')[0].addEventListener(
-                'blur',  event => {
-
-                    const date = new Date( event.target.textContent.split(',')[0] );
-
-                    if (date == 'Invalid Date')  return event.target.focus();
-
-                    year.textContent = date.getFullYear();
-
-                    this.switchMonth( month[ date.getMonth() ] );
-                }
-            );
-        }
-
-        makeDate(month) {
-
-            const year = this.$('nav > div')[0].textContent;
-
-            month = month  ?  `${year}-${month.padStart(2, 0)}`  :  Date.now();
-
-            return  (new Date( month )).toISOString().slice(0, 7);
-        }
-
-        set step(value) {
-
-            WebCell.set(this, 'step', value);
-
-            this.switchStep(
-                this.$(`${
-                    selector_map.Step
-                }[data-step="${
-                    this.convention ? 1 : value
-                }"]`)[0]
-            );
-        }
-
-        connectedCallback() {
-
-            this.listen();
-
-            this.value = this.defaultValue || this.makeDate();
-
-            const value = this.value.split('-');
-
-            this.$('nav > div')[0].textContent = value[0];
-
-            if (! this.step)  this.step = 1;
-
-            this.switchMonth(
-                this.$(`${ selector_map.Month }:nth-child(${ +value[1] })`)[0]
-            );
-        }
-
-        toggleActive(target,  step = 1) {
-
-            const active = MonthPicker.indexOf( target ), list = [ ];
-
-            Array.from(target.parentNode.children,  (child, index) => {
-
-                if ((child === target)  ||  (
-                    (index > active)  &&  (index < active + step)
-                )) {
-                    child.classList.add('active');
-
-                    list.push( child.textContent );
-                } else
-                    child.classList.remove('active');
-            });
-
-            return list;
-        }
-
-        switchMonth(first) {
-
-            first = first || this.$('main > .active')[0];
-
-            if (! first)  return;
-
-            if ( this.convention )
-                first = this.$( selector_map.Month )[
-                    this.step * Math.floor(
-                        MonthPicker.indexOf( first ) / this.step
-                    )
-                ];
-
-            const active = this.toggleActive(first, this.step);
-
-            const last = active[1] && active.pop();
-
-            this.value = [
-                this.makeDate( active[0] ),  last && this.makeDate( last )
-            ];
-        }
-
-        switchStep(target) {
-
-            if (! target)  return;
-
-            this.toggleActive(target);
-
-            WebCell.set(this, 'step', +target.dataset.step);
-
-            this.switchMonth();
-        }
-
-        switchYear (target) {
-
-            if ( target.previousElementSibling )
-                target.previousElementSibling.textContent++;
-            else
-                target.nextElementSibling.textContent--;
-
-            this.switchMonth();
-        }
-    });
-})();
+        this.month = this.month;
+    }
+}

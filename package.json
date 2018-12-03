@@ -1,36 +1,70 @@
 {
-  "name": "month-picker",
-  "version": "0.7.0",
-  "description": "A Web component for picking months by different steps",
-  "main": "source/index.js",
-  "scripts": {
-    "start": "web-server -o",
-    "lint": "eslint ./source/ ./test/",
-    "precommit": "npm run lint",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/TechQuery/month-picker.git"
-  },
-  "keywords": [
-    "date-picker",
-    "html-element",
-    "web-component",
-    "web-cell"
-  ],
-  "author": "shiy2008@gmail.com",
-  "license": "LGPL-3.0",
-  "bugs": {
-    "url": "https://github.com/TechQuery/month-picker/issues"
-  },
-  "homepage": "https://github.com/TechQuery/month-picker#readme",
-  "devDependencies": {
-    "eslint": "^4.19.1",
-    "husky": "^0.14.3",
-    "koapache": "^0.2.1"
-  },
-  "dependencies": {
-    "web-cell": "^0.7.0"
-  }
+    "name": "month-picker",
+    "version": "0.8.0",
+    "description": "A Web component for picking months by different steps",
+    "keywords": [
+        "date-picker",
+        "html-element",
+        "web-component",
+        "web-cell",
+        "web",
+        "component",
+        "SPA"
+    ],
+    "author": "shiy2008@gmail.com",
+    "license": "LGPL-3.0",
+    "homepage": "https://techquery.github.io/month-picker/",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/TechQuery/month-picker.git"
+    },
+    "bugs": {
+        "url": "https://github.com/TechQuery/month-picker/issues"
+    },
+    "main": "source/index.js",
+    "scripts": {
+        "start": "web-server -o",
+        "dev": "web-cell preview",
+        "format": "prettier --write \"{,!(node_modules|.git|dist|docs)/**/}*.{html,md,css,less,js,json}\"",
+        "lint": "eslint . --ignore-pattern dist/ --fix",
+        "build": "npm run format  &&  npm run lint  &&  web-cell pack",
+        "test": "npm run build"
+    },
+    "directories": {
+        "lib": "source/",
+        "test": "."
+    },
+    "engines": {
+        "node": "^6.3.0"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "npm test  &&  git add ."
+        }
+    },
+    "dependencies": {
+        "@babel/polyfill": "^7.0.0",
+        "@webcomponents/webcomponentsjs": "^2.2.1",
+        "web-cell": "^0.10.10",
+        "whatwg-fetch": "^3.0.0"
+    },
+    "devDependencies": {
+        "@babel/plugin-proposal-decorators": "^7.1.6",
+        "babel-eslint": "^10.0.1",
+        "eslint": "^5.9.0",
+        "husky": "^1.2.0",
+        "koapache": "^1.0.4",
+        "prettier": "^1.15.3",
+        "web-cell-cli": "^0.8.0"
+    },
+    "babel": {
+        "plugins": [
+            [
+                "@babel/plugin-proposal-decorators",
+                {
+                    "decoratorsBeforeExport": true
+                }
+            ]
+        ]
+    }
 }

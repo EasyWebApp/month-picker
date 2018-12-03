@@ -1,0 +1,104 @@
+.table-row {
+    display: table;
+    margin: 0;
+    padding: 0;
+}
+.table-row > * {
+    display: table-cell;
+    vertical-align: top;
+}
+.no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: pointer;
+}
+[contenteditable][rows="1"] {
+    padding: 0.5rem;
+    height: 1.4rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.button {
+    padding: 0.5rem;
+    text-align: center;
+    line-height: 1.5rem;
+    transition: 0.25s;
+}
+.button.active {
+    background: lightskyblue;
+    color: white;
+}
+
+:host {
+    display: inline-block;
+    outline: none;
+}
+
+div[contenteditable][rows="1"] {
+    border: 1px solid;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+    width: 8.2rem;
+    position: relative;
+}
+div[contenteditable]::before,
+div[contenteditable]::after {
+    position: absolute;
+    top: 0.5rem;
+    z-index: 1;
+    width: 1.5rem;
+    text-align: center;
+}
+div[contenteditable]::before {
+    content: "📅";
+    left: 0.5rem;
+}
+div[contenteditable]::after {
+    content: "↓";
+    right: 0.5rem;
+}
+
+main.table-row {
+    display: none;
+    position: absolute;
+    z-index: 2;
+    background: white;
+    box-shadow: 1px 2px 3px gray;
+}
+:host(:focus) main.table-row {
+    display: block;
+}
+
+main > nav {
+    padding-right: 0.5rem;
+}
+main > nav > input {
+    display: none;
+}
+main > nav > label:extend(.button) {
+    display: block;
+}
+main > nav > input:checked + label:extend(.button.active) {
+}
+
+nav.table-row {
+    margin: auto;
+}
+nav.table-row > *:extend(.button) {
+}
+nav.table-row > span:active:extend(.button.active) {
+}
+
+#Month {
+    width: 7.5rem;
+}
+#Month > span:extend(.button) {
+    display: inline-block;
+    vertical-align: middle;
+    width: 1.5rem;
+}
+#Month > span.active:extend(.button.active) {
+}

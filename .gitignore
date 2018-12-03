@@ -60,3 +60,9 @@ typings/
 # Editor & IDE configuration
 .vscode/
 .idea/
+
+# Online platform
+.github/
+
+# OS
+.DS_Store

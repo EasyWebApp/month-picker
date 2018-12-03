@@ -1,39 +1,38 @@
-<!DocType HTML>
-<html><head>
-    <title>Month-picker</title>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Month-picker</title>
+        <style>
+            dd {
+                padding: 0.25rem 0;
+            }
+        </style>
+        <script src="https://web-conf.leanapp.cn/node_modules/@babel/polyfill/dist/polyfill.min.js"></script>
+        <script src="https://web-conf.leanapp.cn/node_modules/whatwg-fetch/dist/fetch.umd.js"></script>
+        <script src="https://web-conf.leanapp.cn/node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+        <script src="https://web-conf.leanapp.cn/node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"></script>
 
-    <script src="https://cdn.bootcss.com/webcomponentsjs/1.2.0/webcomponents-lite.js"></script>
-    <script src="node_modules/web-cell/build/WebCell.js"></script>
+        <script src="https://web-conf.leanapp.cn/node_modules/web-cell/dist/web-cell.min.js"></script>
+        <script src="dist/source.js"></script>
+    </head>
+    <body>
+        <h1>Month-picker</h1>
 
-    <link rel="import" href="source/index.html" />
-    <style>
-        dd {
-            padding:    0.25rem  0;
-        }
-    </style>
-</head><body>
-    <h1>Month-picker</h1>
+        <h2>Demo</h2>
+        <dl>
+            <dt>Default</dt>
+            <dd><month-picker></month-picker></dd>
+            <dt>Default value</dt>
+            <dd><month-picker value="1989-06"></month-picker></dd>
+            <dt>Convention</dt>
+            <dd><month-picker convention=""></month-picker></dd>
+            <dt>Custom step</dt>
+            <dd><month-picker step="2"></month-picker></dd>
+        </dl>
 
-    <h2>Demo</h2>
-    <dl>
-        <dt>Default</dt>
-        <dd>
-            <month-picker></month-picker>
-        </dd>
-        <dt>Default value</dt>
-        <dd>
-            <month-picker value="1989-06"></month-picker>
-        </dd>
-        <dt>Convention</dt>
-        <dd>
-            <month-picker convention></month-picker>
-        </dd>
-        <dt>Custom step</dt>
-        <dd>
-            <month-picker step="2"></month-picker>
-        </dd>
-    </dl>
-
-    <h2>Source code</h2>
-    <a href="https://github.com/TechQuery/month-picker/">GitHub</a>
-</body></html>
+        <h2>Source code</h2>
+        <a target="_blank" href="https://github.com/TechQuery/month-picker/"
+            >GitHub</a
+        >
+    </body>
+</html>
